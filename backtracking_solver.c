@@ -30,19 +30,7 @@ static bool is_valid_queen(int x, int y) {
       return false;
     }
   }
-/*
-  for (int row = y, col = x; row < N && col >= 0; row++, col--) {
-    if (board[row][col]) {
-      return false;
-    }
-  }
 
-  for (int row = y, col = x; row < N && col < N; row++, col++) {
-    if (board[row][col]) {
-      return false;
-    }
-  }
-*/
   return true;
 }
 
