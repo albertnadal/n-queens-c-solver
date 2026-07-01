@@ -1,0 +1,21 @@
+CC = gcc
+CFLAGS = -O3 -march=native
+
+BACKTRACKING_SRC = backtracking_solver.c
+BACKTRACKING_BIN = backtracking_solver
+
+EFFICIENT_SRC = efficient_solver.c
+EFFICIENT_BIN = efficient_solver
+
+all: $(BACKTRACKING_BIN) $(EFFICIENT_BIN)
+
+$(BACKTRACKING_BIN): $(BACKTRACKING_SRC)
+	$(CC) $(CFLAGS) $(BACKTRACKING_SRC) -o $(BACKTRACKING_BIN)
+
+$(EFFICIENT_BIN): $(EFFICIENT_SRC)
+	$(CC) $(CFLAGS) $(EFFICIENT_SRC) -o $(EFFICIENT_BIN)
+
+clean:
+	rm -f $(BACKTRACKING_BIN) $(EFFICIENT_BIN)
+
+.PHONY: all clean

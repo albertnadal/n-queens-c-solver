@@ -1,0 +1,18 @@
+# Compiled binaries
+backtracking_solver
+efficient_solver
+
+# Object files
+*.o
+*.obj
+
+# Debug files
+*.dSYM/
+*.su
+*.idb
+*.pdb
+
+# Editor swap files
+*.swp
+*.swo
+*~
