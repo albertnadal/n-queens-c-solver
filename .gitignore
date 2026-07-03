@@ -1,6 +1,7 @@
 # Compiled binaries
-backtracking_solver
-efficient_solver
+slow_solver
+fast_solver
+super_fast_solver
 
 # Object files
 *.o

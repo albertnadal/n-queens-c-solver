@@ -1,13 +1,19 @@
-CC = gcc
+CC = clang
 CFLAGS = -O3 -march=native
+OPENMP_FLAGS = -Xpreprocessor -fopenmp
+OPENMP_INCLUDE = -I/opt/homebrew/opt/libomp/include
+OPENMP_LIB = -L/opt/homebrew/opt/libomp/lib -lomp
 
-BACKTRACKING_SRC = backtracking_solver.c
-BACKTRACKING_BIN = backtracking_solver
+BACKTRACKING_SRC = slow_solver.c
+BACKTRACKING_BIN = slow_solver
 
-EFFICIENT_SRC = efficient_solver.c
-EFFICIENT_BIN = efficient_solver
+EFFICIENT_SRC = fast_solver.c
+EFFICIENT_BIN = fast_solver
 
-all: $(BACKTRACKING_BIN) $(EFFICIENT_BIN)
+PARALLEL_SRC = super_fast_solver.c
+PARALLEL_BIN = super_fast_solver
+
+all: $(BACKTRACKING_BIN) $(EFFICIENT_BIN) $(PARALLEL_BIN)
 
 $(BACKTRACKING_BIN): $(BACKTRACKING_SRC)
 	$(CC) $(CFLAGS) $(BACKTRACKING_SRC) -o $(BACKTRACKING_BIN)
@@ -15,7 +21,10 @@ $(BACKTRACKING_BIN): $(BACKTRACKING_SRC)
 $(EFFICIENT_BIN): $(EFFICIENT_SRC)
 	$(CC) $(CFLAGS) $(EFFICIENT_SRC) -o $(EFFICIENT_BIN)
 
+$(PARALLEL_BIN): $(PARALLEL_SRC)
+	$(CC) $(CFLAGS) $(OPENMP_FLAGS) $(OPENMP_INCLUDE) $(PARALLEL_SRC) $(OPENMP_LIB) -o $(PARALLEL_BIN)
+
 clean:
-	rm -f $(BACKTRACKING_BIN) $(EFFICIENT_BIN)
+	rm -f $(BACKTRACKING_BIN) $(EFFICIENT_BIN) $(PARALLEL_BIN)
 
 .PHONY: all clean
