@@ -12,7 +12,9 @@
 
 typedef struct {
   int solutions_count;
+#if STORE_SOLUTIONS
   int solutions[MAX_SOLUTIONS][2 * N];
+#endif
   int current_solution[2 * N];
 } thread_data;
 
@@ -65,7 +67,7 @@ int main(int argc, char *argv[]) {
   thread_data *threads_data = malloc(sizeof(thread_data) * num_threads);
 
   if (threads_data == NULL) {
-    fprintf(stderr, "Error: no s'ha pogut reservar memòria per a threads_data\n");
+    fprintf(stderr, "Error: cannot allocate memory for threads_data.\n");
     return 1;
   }
 
@@ -74,11 +76,12 @@ int main(int argc, char *argv[]) {
   }
 
   clock_gettime(CLOCK_MONOTONIC, &start);
-  int range_per_thread = N / num_threads;
+  int range_per_thread = (num_threads >= N) ? 1 : N / num_threads;
+  int max_usable_threads = (num_threads >= N) ? N : num_threads;
 #pragma omp parallel for schedule(static)
-  for (int thread_idx = 0; thread_idx < num_threads; thread_idx++) {
+  for (int thread_idx = 0; thread_idx < max_usable_threads; thread_idx++) {
     int start_x = thread_idx * range_per_thread;
-    int end_x = (thread_idx == num_threads - 1) ? N : start_x + range_per_thread;
+    int end_x = (thread_idx == max_usable_threads - 1) ? N : start_x + range_per_thread;
     solve_n_queens(start_x, end_x, 0, 0, 0, 0, thread_idx, threads_data);
   }
   clock_gettime(CLOCK_MONOTONIC, &end);
