@@ -1,6 +1,7 @@
 #include <stdbool.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <assert.h>
 #include <time.h>
 
 #define STORE_SOLUTIONS 0 // Set to 0 to disable storing solutions in memory
@@ -35,34 +36,39 @@ bool is_valid_queen(int x, int y) {
   return true;
 }
 
-static void solve_n_queens(int y) {
+static void solve_n_queens(int y, int last_col) {
   if (y >= N) {
 #ifdef STORE_SOLUTIONS
     // Store the solution in the solutions array
-    for (int i = 0; i < 2 * N; i++) {
+    for (int i = 0; i < 2 * N; i += 2) {
       solutions[solutions_count][i] = current_solution[i];
+      solutions[solutions_count][i + 1] = current_solution[i + 1];
+      solutions[solutions_count + 1][i] = (N - 1) - current_solution[i];
+      solutions[solutions_count + 1][i + 1] = current_solution[i + 1];
     }
 #endif
-    solutions_count++;
+    solutions_count += 2;
     return;
   }
 
-  for (int x = 0; x < N; x++) {
+  for (int x = 0; x < last_col; x++) {
     if (is_valid_queen(x, y)) {
       board[y][x] = true;
       current_solution[y * 2] = x;
       current_solution[y * 2 + 1] = y;
-      solve_n_queens(y + 1);
+      solve_n_queens(y + 1, N);
       board[y][x] = false;
     }
   }
 }
 
 int main(int argc, char *argv[]) {
+  assert((N % 2) == 0 && "N value must be even.");
+
   struct timespec start, end;
 
   clock_gettime(CLOCK_MONOTONIC, &start);
-  solve_n_queens(0);
+  solve_n_queens(0, N / 2);
   clock_gettime(CLOCK_MONOTONIC, &end);
 
   long long elapsed_ns = (end.tv_sec - start.tv_sec) * 1000000000LL +
