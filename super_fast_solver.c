@@ -4,11 +4,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
+#include <assert.h>
 #include <omp.h>
 
-#define STORE_SOLUTIONS 0 // Set to 0 to disable storing solutions in memory
-#define N 16 // Cannot be greater than 16 due to using uint32_t values for bitmasking
-#define MAX_SOLUTIONS 14772512 // Use 92 for N=8, 724 for N=10, 2680 for N=12, 14200 for N=14, 14772512 for N=16
+#define STORE_SOLUTIONS 1 // Set to 0 to disable storing solutions in memory
+#define N 8 // Cannot be greater than 16 due to using uint32_t values for bitmasking
+#define MAX_SOLUTIONS 92 // Use 92 for N=8, 724 for N=10, 2680 for N=12, 14200 for N=14, 14772512 for N=16
 
 typedef struct {
   int solutions_count;
@@ -41,11 +42,14 @@ void solve_n_queens(int start_x, int end_x, int y, uint32_t vertical_mask, uint3
   if (y >= N) {
 #if STORE_SOLUTIONS
     // Store the solution in the solutions array
-    for (int i = 0; i < 2 * N; i++) {
+    for (int i = 0; i < 2 * N; i += 2) {
       thread_data[thread_idx].solutions[thread_data[thread_idx].solutions_count][i] = thread_data[thread_idx].current_solution[i];
+      thread_data[thread_idx].solutions[thread_data[thread_idx].solutions_count][i + 1] = thread_data[thread_idx].current_solution[i + 1];
+      thread_data[thread_idx].solutions[thread_data[thread_idx].solutions_count + 1][i] = thread_data[thread_idx].current_solution[i];
+      thread_data[thread_idx].solutions[thread_data[thread_idx].solutions_count + 1][i + 1] = (N - 1) - thread_data[thread_idx].current_solution[i + 1];
     }
 #endif
-    thread_data[thread_idx].solutions_count++;
+    thread_data[thread_idx].solutions_count += 2;
     return;
   }
 
@@ -61,6 +65,8 @@ void solve_n_queens(int start_x, int end_x, int y, uint32_t vertical_mask, uint3
 }
 
 int main(int argc, char *argv[]) {
+  assert((N % 2) == 0 && "N value must be even.");
+
   struct timespec start, end;
   int num_threads = (int)sysconf(_SC_NPROCESSORS_ONLN);
   printf("Solving %d-Queen Problem with %d parallel threads.\n", N, num_threads);
@@ -76,12 +82,12 @@ int main(int argc, char *argv[]) {
   }
 
   clock_gettime(CLOCK_MONOTONIC, &start);
-  int range_per_thread = (num_threads >= N) ? 1 : N / num_threads;
-  int max_usable_threads = (num_threads >= N) ? N : num_threads;
+  int range_per_thread = (num_threads >= N / 2) ? 1 : (N / 2) / num_threads;
+  int max_usable_threads = (num_threads >= N / 2) ? N / 2 : num_threads;
 #pragma omp parallel for schedule(static)
   for (int thread_idx = 0; thread_idx < max_usable_threads; thread_idx++) {
     int start_x = thread_idx * range_per_thread;
-    int end_x = (thread_idx == max_usable_threads - 1) ? N : start_x + range_per_thread;
+    int end_x = (thread_idx == max_usable_threads - 1) ? N / 2 : start_x + range_per_thread;
     solve_n_queens(start_x, end_x, 0, 0, 0, 0, thread_idx, threads_data);
   }
   clock_gettime(CLOCK_MONOTONIC, &end);

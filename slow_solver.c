@@ -4,9 +4,9 @@
 #include <assert.h>
 #include <time.h>
 
-#define STORE_SOLUTIONS 0 // Set to 0 to disable storing solutions in memory
-#define N 16
-#define MAX_SOLUTIONS 14772512 // Use 92 for N=8, 724 for N=10, 2680 for N=12, 14200 for N=14, 14772512 for N=16
+#define STORE_SOLUTIONS 1 // Set to 0 to disable storing solutions in memory
+#define N 8
+#define MAX_SOLUTIONS 92 // Use 92 for N=8, 724 for N=10, 2680 for N=12, 14200 for N=14, 14772512 for N=16
 
 static int solutions_count = 0;
 static int solutions[MAX_SOLUTIONS][2 * N];
