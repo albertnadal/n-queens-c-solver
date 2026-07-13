@@ -12,20 +12,21 @@ static int solutions[MAX_SOLUTIONS][2 * N];
 static int current_solution[2 * N];
 static bool board[N][N] = {0};
 
-static bool is_valid_queen(int x, int y) {
-  for (int row = 0; row < N; row++) {
+static inline __attribute__((always_inline))
+bool is_valid_queen(int x, int y) {
+  for (int row = y - 1; row >= 0; row--) {
     if (board[row][x]) {
       return false;
     }
   }
 
-  for (int row = y, col = x; row >= 0 && col >= 0; row--, col--) {
+  for (int row = y - 1, col = x - 1; row >= 0 && col >= 0; row--, col--) {
     if (board[row][col]) {
       return false;
     }
   }
 
-  for (int row = y, col = x; row >= 0 && col < N; row--, col++) {
+  for (int row = y - 1, col = x + 1; row >= 0 && col < N; row--, col++) {
     if (board[row][col]) {
       return false;
     }
